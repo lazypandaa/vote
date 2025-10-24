@@ -3,7 +3,8 @@ pipeline {
     
     tools {
         nodejs 'NodeJS'
-        maven 'Maven'
+        maven 'MAVEN_HOME'
+        jdk 'JAVA_HOME'
     }
 
     stages {
