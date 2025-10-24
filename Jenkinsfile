@@ -23,9 +23,9 @@ pipeline {
         stage('Deploy Frontend to Tomcat') {
             steps {
                 sh '''
-                rm -rf /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-frontend
-                mkdir -p /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-frontend
-                cp -r FRONTEND/dist/* /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-frontend/
+                mkdir -p ${WORKSPACE}/deploy/frontend
+                cp -r FRONTEND/dist/* ${WORKSPACE}/deploy/frontend/
+                echo "Frontend deployed to ${WORKSPACE}/deploy/frontend"
                 '''
             }
         }
@@ -43,9 +43,9 @@ pipeline {
         stage('Deploy Backend to Tomcat') {
             steps {
                 sh '''
-                rm -f /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-backend.war
-                rm -rf /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-backend
-                cp BACKEND/target/*.war /usr/local/Cellar/tomcat/*/libexec/webapps/
+                mkdir -p ${WORKSPACE}/deploy/backend
+                cp BACKEND/target/*.war ${WORKSPACE}/deploy/backend/
+                echo "Backend deployed to ${WORKSPACE}/deploy/backend"
                 '''
             }
         }
