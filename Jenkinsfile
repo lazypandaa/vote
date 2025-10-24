@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    
+    tools {
+        nodejs 'NodeJS'
+        maven 'Maven'
+    }
 
     stages {
 
@@ -7,8 +12,8 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('FRONTEND') {
-                    bat 'npm install'
-                    bat 'npm run build'
+                    sh 'npm install'
+                    sh 'npm run build'
                 }
             }
         }
@@ -16,12 +21,10 @@ pipeline {
         // ===== FRONTEND DEPLOY =====
         stage('Deploy Frontend to Tomcat') {
             steps {
-                bat '''
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\2300032990-frontend" (
-                    rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\2300032990-frontend"
-                )
-                mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\2300032990-frontend"
-                xcopy /E /I /Y FRONTEND\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\2300032990-frontend\\"
+                sh '''
+                rm -rf /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-frontend
+                mkdir -p /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-frontend
+                cp -r FRONTEND/dist/* /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-frontend/
                 '''
             }
         }
@@ -30,7 +33,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('BACKEND') {
-                    bat 'mvn clean package'
+                    sh 'mvn clean package'
                 }
             }
         }
@@ -38,14 +41,10 @@ pipeline {
         // ===== BACKEND DEPLOY =====
         stage('Deploy Backend to Tomcat') {
             steps {
-                bat '''
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\2300032990-backend.war" (
-                    del /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\2300032990-backend.war"
-                )
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\2300032990-backend" (
-                    rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\2300032990-backend"
-                )
-                copy "BACKEND\\target\\*.war" "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\"
+                sh '''
+                rm -f /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-backend.war
+                rm -rf /usr/local/Cellar/tomcat/*/libexec/webapps/2300032990-backend
+                cp BACKEND/target/*.war /usr/local/Cellar/tomcat/*/libexec/webapps/
                 '''
             }
         }
